@@ -1,4 +1,3 @@
-// src/main/java/com/tebudi/TeBuDi/config/SecurityConfig.java
 package com.tebudi.TeBuDi.config;
 
 import java.util.Arrays;
@@ -20,17 +19,17 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.tebudi.TeBuDi.security.SessionAuthFilter;
+import com.tebudi.TeBuDi.security.JwtAuthFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final SessionAuthFilter sessionAuthFilter;
+    private final JwtAuthFilter jwtAuthFilter;
 
-    public SecurityConfig(SessionAuthFilter sessionAuthFilter) {
-        this.sessionAuthFilter = sessionAuthFilter;
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
     }
 
     @Bean
@@ -40,7 +39,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
-            .addFilterBefore(sessionAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             )
@@ -49,8 +48,9 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health", "/actuator/**").permitAll()
                 .anyRequest().authenticated()
             )
+            // Stateless — tidak pakai session sama sekali
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             );
 
         return http.build();
@@ -65,8 +65,7 @@ public class SecurityConfig {
             "https://tebudi-*.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Cookie"));
-        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 

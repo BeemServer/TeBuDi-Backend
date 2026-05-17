@@ -76,6 +76,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
+    @SuppressWarnings("unchecked")
     public BookResponseDTO saveBook(BookRegisterDTO request) {
         if (bookRepository.existsById(request.getId())) {
             throw new RuntimeException("ID Book sudah terdaftar");
@@ -119,6 +120,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
+    @SuppressWarnings("unchecked")
     public BookResponseDTO updateBook(String id, BookUpdateDTO request) {
         Book book = bookRepository.findByIdWithCategory(id)
                     .orElseThrow(() -> new RuntimeException("Buku tidak ditemukan!"));
