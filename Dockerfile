@@ -11,6 +11,6 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # Port default yang dibaca oleh Render
-EXPOSE 8080
+EXPOSE 7860
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dserver.port=7860", "-jar", "app.jar"]
