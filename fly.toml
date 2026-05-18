@@ -1,0 +1,29 @@
+# fly.toml app configuration file generated for tebudi-backend
+app = 'tebudi-backend'
+primary_region = 'sin'
+
+[build]
+
+[env]
+  SPRING_PROFILES_ACTIVE = "prod"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+# Menggunakan struktur penulisan checks yang valid untuk http_service
+[[http_service.checks]]
+  grace_period = "90s"   # Memberikan waktu longgar bagi Spring Boot untuk inisialisasi
+  interval = "15s"
+  method = "get"
+  path = "/actuator/health"     # Diarahkan ke actuator karena biasanya endpoint ini di-permitall / aman dari redirect login
+  timeout = "10s"
+
+[[vm]]
+  memory = '1gb'
+  cpus = 1
+  memory_mb = 1024
